@@ -37,6 +37,21 @@ class GraphAdjMatrix:
 
         return order
 
+    def dfs(self, root):
+        visited, stack, order = [False for i in range(self.N_vertices + 1)], [root], []
+
+        visited[root] = True
+        while stack:
+            curr = stack.pop()
+            order.append(curr)
+
+            for neighbor_vertex in self.get_neighbors(curr):
+                if visited[neighbor_vertex] == False:
+                    stack.append(neighbor_vertex)
+                    visited[neighbor_vertex] = True
+
+        return order
+
 
     # this smells like a list comprehension oneliner but i could not get the index in thru enumerate and filter() :x
     # or we could just save neighbors directly instead of NxN matrix, but this is a Graph__AdjMatrix__ :)
@@ -48,14 +63,26 @@ class GraphAdjMatrix:
 
         return edges
 
-g = GraphAdjMatrix(5)
-g.add_edge(1, 2)
-g.add_edge(0, 3)
-g.add_edge(0, 4)
-g.add_edge(4, 2)
+def make_graph():
+    g = GraphAdjMatrix(5)
+    g.add_edge(1, 2)
+    g.add_edge(0, 3)
+    g.add_edge(0, 4)
+    g.add_edge(4, 2)
 
-print(g.adj_matrix)
-print(g.get_all_edges())
-print("edges of 0:", g.get_neighbors(0))
-print("edges of 2:", g.get_neighbors(2))
-print("order of bfs(0)", g.bfs(0))
+    return g
+
+import unittest
+
+class TestGraphAdjMatrix(unittest.TestCase):
+    def test_neighbors_0(self):
+        self.assertEqual(make_graph().get_neighbors(0), [3, 4])
+
+    def test_neighbors_2(self):
+        self.assertEqual(make_graph().get_neighbors(2), [1, 4])
+
+    def test_bfs_0(self):
+        self.assertEqual(make_graph().bfs(0), [0, 3, 4, 2, 1])
+
+    def test_dfs_0(self):
+        self.assertEqual(make_graph().dfs(0), [0, 4, 2, 1, 3])
